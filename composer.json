@@ -1,0 +1,31 @@
+{
+    "autoload": {
+        "psr-4": {
+            "App\\": "./src/App",
+            "Config\\": "./src/Config",
+            "Config\\App\\": "./src/Config/App",
+            "Config\\App\\Autoloading\\": "./src/Config/App/Autoloading",
+            "Framework\\": "./src/Framework",
+            "Framework\\DI\\": "./src/Framework/DI",
+            "Framework\\Helpers\\": "./src/Framework/Helpers",
+            "Framework\\Routing\\": "./src/Framework/Routing"
+        }
+    },
+    "require": {
+        "slim/slim": "^4.10",
+        "slim/psr7": "^1.5",
+        "php-di/php-di": "^6.4",
+        "php-di/slim-bridge": "^3.2",
+        "guyliangilsing/php-abstract-router": "^1.1.1",
+        "vlucas/phpdotenv": "^5.4"
+    },
+    "require-dev": {
+        "nunomaduro/phpinsights": "^2.3",
+        "phpunit/phpunit": "^9.5"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}
