@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Framework\Helpers;
+namespace App\Common\Helpers;
 
 final class HTTP
 {
-    public static function schemeAndHost(): string
+    public static function absolutePathBase(): string
     {
         return isset($_SERVER['HTTPS']) ? 'https://'.$_SERVER['HTTP_HOST'] : 'http://'.$_SERVER['HTTP_HOST'];
     }

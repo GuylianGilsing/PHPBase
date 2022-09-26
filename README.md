@@ -24,6 +24,11 @@ A simple base project for custom PHP applications.
         - [Running the tool](#running-the-tool)
         - [Receive a detailed report for your written source code](#receive-a-detailed-report-for-your-written-source-code)
         - [Configuring rules](#configuring-rules)
+    - [Folder structure](#folder-structure)
+        - [App directory](#app-directory)
+        - [Config directory](#config-directory)
+        - [Framework directory](#framework-directory)
+    - [Application startup process](#application-startup-process)
     - [Testing](#testing)
         - [Run unit test suite](#run-unit-test-suite)
         - [Run integration test suite](#run-integration-test-suite)
@@ -36,15 +41,14 @@ Before this project base can be used, the following tools and applications must 
 - [Composer](https://getcomposer.org/)
 - [PHP](https://www.php.net/downloads)
 - [Docker](https://www.docker.com/)
-- [Docker compose](https://docs.docker.com/compose/install/)
 
 ### Application and tool versions
 This project base has been created with the following application and tool versions:
 
-| Name | Min. version |
-|------|--------------|
-| composer | 2.4.2 |
-| php | 8.1.0 |
+| Name | Min. version | Max. version |
+|------|--------------|--------------|
+| composer | 2.4.2 | latest
+| php | 8.1.0 | 8.1.x
 
 ### Required PHP extensions
 The following extensions must be activated inside the `php.ini` file:
@@ -146,6 +150,50 @@ $ ./vendor/bin/phpinsights.bat analyse -v
 
 ### Configuring rules
 PHP insights's analysis rules can be configured through the `phpinsights.php` file inside the root directory.
+
+## Folder structure
+All code that directly provides functionality to the main application should be placed in the `src` (source) directory. Within `src`, the following folders are placed:
+
+- `App` contains all application code.
+- `Config` contains all application configuration code (dependency injection setup, ORM setup, loading .env files, etc.).
+- `Framework` contains all code that provide basic functionality to the application startup process (providing a routing handler, registering dependency container definitions with the DI library, etc.)
+
+### App directory
+The `App` directory contains all application code, a layered architecture is being used by default. The app directory has the following sub directories:
+
+**Common**<br/>
+This directory contains all code that needs to be re=used throughout each layer inside the application.
+
+**Common\Helpers**<br/>
+This directory contains all helper code that needs to be re=used throughout each layer inside the application. It comes with a standard `HTTP` class that only provides a base for absolute paths.
+
+**Presentation**<br/>
+This directory contains all code for the presentation layer of the application. Within this directory, everything that provides functionality for the presentation side of your application should be placed here.
+
+**Presentation\Middleware**<br/>
+This directory contains all middleware that the presentation layer needs to use. It comes with a standard middleware class that removes trailing, and duplicate, slashes from the URL.
+
+### Config directory
+This directory contains all code that provides functionality for the startup process of the entire application. The directory comes with a singular `di.php` file that provides `DIConfig` classes. A `DIConfig` is a class that provides specific data to the dependency container.
+
+**App**<br/>
+This directory contains all configuration classes that provide functionality to the application.
+
+**App\Autoloading**<br/>
+This directory contains `DIConfig` classes that provide specific data to the dependency container. A `DIConfig` class can be used to add [definitions](https://php-di.org/doc/definition.html) to the dependency container, or run a necesary startup process (like loading .env files or setting up a database connection). There are three default `DIConfig` classes:
+
+- `SetupDependenciesDIConfig` adds generic dependency container definitions to the dependency container.
+- `SetupEnvDIConfig` loads the `.env` file content and adds the variables to the `$_ENV` superglobal.
+- `SetupRouterDIConfig` adds routing capability to the application (this is in a separate `DIConfig` class since this process should not be edited).
+
+### Framework directory
+This directory contains all code that provide basic functionality to the application startup process. The framework directory can also include general helpers and utilities, but this only should be done when this is necessary for the startup process, otherwise a `Common` directory of some sorts should be created inside the `./src/App` directory.
+
+## Application startup process
+It is very important to understand how this application base starts up and configures itself before a route can be registered. The application startup process goes as follows:
+
+1. Create a dependency container
+2. Create a base application class that bootstraps a [Slim framework]() `App` instance.
 
 ## Testing
 [PHP unit](https://phpunit.de/) has been set up and configured with two testing suites: unit and integration.

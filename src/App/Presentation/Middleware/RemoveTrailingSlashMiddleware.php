@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Presentation\Middleware;
 
-use Framework\Helpers\HTTP;
+use App\Common\Helpers\HTTP;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -34,7 +34,7 @@ final class RemoveTrailingSlashMiddleware
         $fixedPath = preg_replace($overflowingSlashRegex, '/', $path);
         $fixedPath = preg_replace($trailingSlashRegex, '', $fixedPath);
 
-        $fixedPath = HTTP::schemeAndHost().$fixedPath;
+        $fixedPath = HTTP::absolutePathBase().$fixedPath;
 
         // Add query variables back to the url
         if (!strlen($query) === 0)
