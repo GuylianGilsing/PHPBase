@@ -1,0 +1,15 @@
+# Files
+.gitignore
+.example.env
+
+phpinsights.php
+README.md
+
+Dockerfile
+Dockerfile-dev
+docker-compose.yml
+
+# Folders
+.vscode/*
+vendor/*
+tests/*
