@@ -19,16 +19,21 @@ A simple base project for custom PHP applications.
         - [Request redirects](#request-redirects)
             - [Apache](#apache)
             - [Nginx](#nginx)
-    - [Running the project locally](#running-the-project-locally)
-    - [Static code analysis](#static-code-analysis)
-        - [Running the tool](#running-the-tool)
-        - [Receive a detailed report for your written source code](#receive-a-detailed-report-for-your-written-source-code)
-        - [Configuring rules](#configuring-rules)
-    - [Folder structure](#folder-structure)
+    - [Source directory structure](#source-directory-structure)
         - [App directory](#app-directory)
         - [Config directory](#config-directory)
         - [Framework directory](#framework-directory)
     - [Application startup process](#application-startup-process)
+    - [Running the project locally](#running-the-project-locally)
+    - [Running the project in docker](#running-the-project-in-docker)
+        - [Build image](#build-image)
+        - [Start container](#start-container)
+        - [Stop container](#stop-container)
+        - [Remove container](#remove-container)
+    - [Static code analysis](#static-code-analysis)
+        - [Running the tool](#running-the-tool)
+        - [Receive a detailed report for your written source code](#receive-a-detailed-report-for-your-written-source-code)
+        - [Configuring rules](#configuring-rules)
     - [Testing](#testing)
         - [Run unit test suite](#run-unit-test-suite)
         - [Run integration test suite](#run-integration-test-suite)
@@ -128,30 +133,7 @@ server {
 }
 ```
 
-## Running the project locally
-
-```bash
-$ cd public
-$ php -S 127.0.0.1:8080
-```
-
-## Static code analysis
-[PHP insights](https://phpinsights.com/) is used, and configured, to provide a static code analysis report of the application source code.
-
-### Running the tool
-```bash
-$ ./vendor/bin/phpinsights.bat
-```
-
-### Receive a detailed report for your written source code
-```bash
-$ ./vendor/bin/phpinsights.bat analyse -v
-```
-
-### Configuring rules
-PHP insights's analysis rules can be configured through the `phpinsights.php` file inside the root directory.
-
-## Folder structure
+## Source directory structure
 All code that directly provides functionality to the main application should be placed in the `src` (source) directory. Within `src`, the following folders are placed:
 
 - `App` contains all application code.
@@ -192,11 +174,86 @@ This directory contains all code that provide basic functionality to the applica
 ## Application startup process
 It is very important to understand how this application base starts up and configures itself before a route can be registered. The application startup process goes as follows:
 
-1. Create a dependency container
-2. Create a base application class that bootstraps a [Slim framework]() `App` instance.
+1. Create a dependency container.
+2. Register all dependencies and run all startup processes.
+3. Create a base application class that bootstraps a [Slim framework](https://www.slimframework.com/docs/v4/) `App` instance.
+4. Register all middleware with the slim app instance.
+5. Register routes.
+6. Dispatch routes.
+
+If, for whatever reason, the dependency container needs to be accessed for setting up something like an ORM, the `getDependencyContainer()` function runs step 1 and 2 of the startup process. This function can be called as soon as `./src/bootstrap.php` is included.
+
+**IMPORTANT**: It is not possible to access the dependency container during steps 1 and 2. Do not call the `getDependencyContainer()` multiple times.
+
+## Running the project locally
+If the `php` command can be accessed from within a terminal or CLI, it can be used to run the project locally. For this the following two commands can be issued from the root directory:
+
+```bash
+$ cd public
+$ php -S 127.0.0.1:8080
+```
+
+The first command changes the current directory to the `public` directory. This is the webserver root of the project and contains the entrypoint to the application.
+
+The second command starts up a local php development server. A neat feature of this server is that it redirects everything back to an `index.php` file when there are no other available/matching files. If an actual webserver is needed, it is recommended to look at the docker section of this README file.
+
+## Running the project in docker
+This project base comes with a preconfigured `Dockerfile` that is placed in the root directory. This file creates an image that uses apache as its webserver. The apache configuration file can be found in the `config` folder that is also placed in the root directory.
+
+### Build image
+Before you can run the docker container, you first need to build the image:
+
+```bash
+$ docker build ./ -t YOUR_IMAGE_NAME_HERE
+```
+
+### Start container
+Once you an image, you can run it as follows:
+
+```bash
+$ docker run -it -p 127.0.0.1:8080:80 -td YOUR_IMAGE_NAME_HERE
+```
+
+**Note**: the command above starts this app on the following URL: [127.0.0.1:8080](http://127.0.0.1:8080)
+
+### Stop container
+Once the container is running, you can stop it with the following command:
+
+```bash
+$ docker stop <container_name>
+```
+
+**Note**: the container name can be found by running the following command:
+
+```bash
+$ docker ps
+```
+
+### Remove container
+Once the container is stopped, remove it with the following command:
+
+```bash
+$ docker rm <container_name>
+```
+
+## Static code analysis
+[PHP insights](https://phpinsights.com/) is used, and configured, to provide a static code analysis report of the application source code.
+
+### Running the tool
+```bash
+$ ./vendor/bin/phpinsights.bat
+```
+
+### Receive a detailed report for your written source code
+```bash
+$ ./vendor/bin/phpinsights.bat analyse -v
+```
+
+### Configuring rules
+PHP insights's analysis rules can be configured through the `phpinsights.php` file inside the root directory.
 
 ## Testing
-[PHP unit](https://phpunit.de/) has been set up and configured with two testing suites: unit and integration.
+[PHP unit](https://phpunit.de/) has been set up and configured with two testing suites: unit and integration. The configuration file (`phpunit.xml`) can be found in the root directory.
 
 ### Run unit test suite
 ```bash
