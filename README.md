@@ -7,6 +7,7 @@ A simple base project for custom PHP applications.
 
 - [PHPBase](#phpbase)
     - [Table of Contents](#table-of-contents)
+    - [Installation](#installation)
     - [Prerequisites](#prerequisites)
         - [Application and tool versions](#application-and-tool-versions)
         - [Required PHP extensions](#required-php-extensions)
@@ -39,6 +40,11 @@ A simple base project for custom PHP applications.
         - [Run integration test suite](#run-integration-test-suite)
 
 <!-- /TOC -->
+
+## Installation
+```bash
+$ composer create-project guyliangilsing/php-base YOUR_PROJECT_NAME HERE
+```
 
 ## Prerequisites
 Before this project base can be used, the following tools and applications must be installed and accessible through the command line:
